@@ -4,10 +4,16 @@ const { Server } = require("net");
 const host = "0.0.0.0";
 const END = "END";
 
+const connections = new Map();
+
 const error = (err) => {
   console.error(err);
   process.exit(1);
 };
+
+const sendMessage = (message, origin) => {
+
+}
 
 const listen = (port) => {
   const server = new Server();
@@ -16,9 +22,14 @@ const listen = (port) => {
     console.log(`New connection from ${remoteSocket}`);
     socket.setEncoding("utf-8");
     socket.on("data", (message) => {
-      if (message === END) {
+      if(!connections.has(socket)){
+        console.log(`Username ${message} set for connection ${remoteSocket}`)
+        connections.set(socket, message)
+      } else if (message === END) {
+        console.log(`End connection with ${remoteSocket}`)
         socket.end();
       } else {
+        
         console.log(`${remoteSocket} -> ${message}`);
       }
     });
