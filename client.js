@@ -43,7 +43,7 @@ const connect = (host, port) => {
 };
 
 const main = () => {
-  if (process.argv !== 4) {
+  if (process.argv.length !== 4) {
     error(`Usage: node ${__filename} (host) (port)`);
   }
   let [, , host, port] = process.argv;
