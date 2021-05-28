@@ -12,8 +12,12 @@ const error = (err) => {
 };
 
 const sendMessage = (message, origin) => {
-
-}
+  for (const socket of connections.keys()) {
+    if (socket !== origin) {
+      socket.write(message);
+    }
+  }
+};
 
 const listen = (port) => {
   const server = new Server();
@@ -22,15 +26,20 @@ const listen = (port) => {
     console.log(`New connection from ${remoteSocket}`);
     socket.setEncoding("utf-8");
     socket.on("data", (message) => {
-      if(!connections.has(socket)){
-        console.log(`Username ${message} set for connection ${remoteSocket}`)
-        connections.set(socket, message)
+      if (!connections.has(socket)) {
+        console.log(`Username ${message} set for connection ${remoteSocket}`);
+        connections.set(socket, message);
       } else if (message === END) {
-        console.log(`End connection with ${remoteSocket}`)
+        console.log(`End connection with ${remoteSocket}`);
+        connections.delete(socket);
         socket.end();
       } else {
-        
-        console.log(`${remoteSocket} -> ${message}`);
+        // for (const username of connections.values()){
+        //   console.log(`${username}`)
+        // }
+        const fullMessage = `[${connections.get(socket)}]: ${message}`;
+        console.log(`$${remoteSocket} -> ${fullMessage}`);
+        sendMessage(fullMessage, socket);
       }
     });
     socket.on("close", () =>
